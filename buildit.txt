@@ -1,0 +1,118 @@
+
+🔹 Étape 1 — ⚙️ Définir ton fichier de config
+
+Pourquoi commencer par ça ?
+
+    Car il détermine la structure de ton serveur : ports, racine des fichiers, routes…
+
+    Tu pourras rapidement créer une interface simple pour le parser
+
+Exemple de fichier server.conf inspiré de NGINX :
+
+server {
+    listen 8080;
+    server_name localhost;
+
+    root ./www;
+
+    location /images {
+        root ./www/images;
+    }
+
+    location /api {
+        script ./bin/api_handler;
+    }
+}
+
+Tâches associées :
+
+    Écrire un parser basique de fichier de config (à la main ou avec std::ifstream)
+
+    Créer une structure C++ (structs/classes) qui représente cette config (ex: ServerConfig, LocationBlock...)
+
+🔹 Étape 2 — 🔌 Serveur socket de base
+
+Mettre en place ton serveur TCP :
+
+    Créer une socket (socket())
+
+    Lier (bind()) au port de la config
+
+    Écouter (listen()) les connexions
+
+    Accepter (accept()) les clients
+
+📍 En C++98 tu peux rester en pur C avec des int pour les sockets, mais encapsuler un peu avec des classes C++ pour structurer ton code.
+🔹 Étape 3 — 📥 Lecture & parsing des requêtes HTTP
+
+Lire une requête comme :
+
+GET /index.html HTTP/1.1
+Host: localhost
+User-Agent: ...
+
+Tâches à faire ici :
+
+    Lire le flux via recv() jusqu’à double retour ligne (\r\n\r\n)
+
+    Découper en :
+
+        Méthode (GET, POST…)
+
+        Chemin (/index.html)
+
+        Headers (ligne par ligne)
+
+    Stocker dans une struct HttpRequest
+
+🔹 Étape 4 — 📤 Génération de réponse HTTP
+
+Répondre proprement à une requête, exemple :
+
+HTTP/1.1 200 OK
+Content-Type: text/html
+Content-Length: 123
+
+<html>...</html>
+
+À construire :
+
+    Une struct HttpResponse
+
+    Méthode pour construire l'en-tête
+
+    Méthode pour lire le fichier cible (ex: www/index.html)
+
+    Méthode pour l’envoyer via send()
+
+🔹 Étape 5 — 🔀 Routing / gestion des location (depuis ton fichier config)
+
+En fonction de l’URL demandée :
+
+    Aller chercher dans les location du fichier de config
+
+    Appliquer les règles (root différent, appel d’un exécutable, etc.)
+
+Tu peux faire un mini moteur de matching, genre :
+
+if (req.path.starts_with("/images")) {
+    use location["/images"];
+}
+
+🔹 Étape 6 — 🔄 Boucle d’événements
+
+    Créer une boucle select() (ou poll()) pour gérer plusieurs connexions
+
+    Ou simplement un thread par connexion (plus simple pour commencer, mais moins scalable)
+
+🛠️ Résumé des blocs à coder :
+Bloc	Description
+server.conf	Fichier de config inspiré de NGINX
+ConfigParser	Parser du fichier de config, stocke dans des structs
+HttpServer	Socket listener, gestion des connexions
+HttpRequest	Parser de requête HTTP
+HttpResponse	Générateur de réponse HTTP
+Router	Associe chemins ↔ fichiers/règles depuis config
+Main.cpp	Boucle principale : initialise, écoute, répond
+
+Tu veux que je te pose une base de parser de config simple ou plutôt le serveur socket initial ? On peut avancer brique par brique.
