@@ -6,7 +6,7 @@
 /*   By: yohanafi <yohanafi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/30 17:21:47 by yohanafi          #+#    #+#             */
-/*   Updated: 2025/04/30 18:32:40 by yohanafi         ###   ########.fr       */
+/*   Updated: 2025/05/01 15:30:43 by yohanafi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,8 +19,8 @@
 class Client
 {
     public:
-        socklen_t                 _addrLen;
-        struct sockaddr_in   _socket_client;
+        socklen_t           _addrLen;
+        struct sockaddr_in  _socket_client;
         int                 _fd_client;
         Client(void);
         ~Client(void);
